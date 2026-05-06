@@ -5,6 +5,7 @@ import com.codewithmosh.store.dtos.UpdateUserRequest;
 import com.codewithmosh.store.dtos.UserDto;
 import com.codewithmosh.store.mappers.UserMapper;
 import com.codewithmosh.store.repositories.UserRepository;
+import com.codewithmosh.store.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
@@ -21,19 +22,13 @@ public class UserController {
 
     private final UserMapper userMapper;
 
+    private final UserService userService;
+
     @GetMapping("")
     public Iterable<UserDto> getAllUsers(
             @RequestParam (required = false,defaultValue = "",name = "sort") String sort
     ) {
-
-        if (!Set.of( "name", "email").contains(sort)){
-            sort = "name";
-        }
-
-        return userRepository.findAll(Sort.by(sort))
-                .stream()
-                .map(userMapper::toDto)
-                .toList();
+        return userService.getAllUsers(sort);
     }
     @GetMapping("/{id}")
 
