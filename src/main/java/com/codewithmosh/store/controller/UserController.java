@@ -33,14 +33,7 @@ public class UserController {
     @GetMapping("/{id}")
 
     public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
-        var user = userRepository.findById(id).orElse(null);
-
-        if(user == null){
-            return ResponseEntity.notFound().build();
-        }
-
-
-        return ResponseEntity.ok(userMapper.toDto(user));
+       return userService.getUserById(id);
     }
     @PostMapping("")
     public ResponseEntity<UserDto> createUser(@RequestBody RegisterUserRequest request,
@@ -49,39 +42,16 @@ public class UserController {
 
     ) {
 
-        var user = userMapper.toEntity(request);
-        System.out.println(user);
-
-        userRepository.save(user);
-
-        var userDto = userMapper.toDto(user);
-        var uri = uriBuilder.path("/users/{id}").buildAndExpand(userDto.getId()).toUri();
-
-
-        return ResponseEntity.created(uri).body(userDto);
+      return userService.createUser(request, uriBuilder);
 
     }
     @PutMapping("/{id}")
     public ResponseEntity<UserDto> updateUser(@PathVariable Long id,
                               @RequestBody UpdateUserRequest request) {
-        var user = userRepository.findById(id).orElse(null);
-
-        if(user == null){
-            return ResponseEntity.notFound().build();
-        }
-
-        userMapper.update(request, user);
-        userRepository.save(user);
-
-        return ResponseEntity.ok(userMapper.toDto(user));
+        return userService.updateUser(id, request);
     }
        @DeleteMapping("/{id}")
         public ResponseEntity<Void> deleteUser(@PathVariable Long id){
-        var user = userRepository.findById(id).orElse(null);
-        if (user == null) {
-            return ResponseEntity.notFound().build();
-        }
-        userRepository.delete(user);
-        return ResponseEntity.noContent().build();
+        return userService.deleteUser(id);
         }
 }
