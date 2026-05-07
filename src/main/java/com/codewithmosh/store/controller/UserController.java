@@ -33,21 +33,30 @@ public class UserController {
     }
     @GetMapping("/{id}")
 
-    public ApiResponse<ResponseEntity<UserDto>> getUserById(@PathVariable Long id) {
+    public ApiResponse<UserDto> getUserById(@PathVariable Long id) {
        return ApiResponse.success(userService.getUserById(id));
     }
     @PostMapping("")
-    public ApiResponse<ResponseEntity<UserDto>> createUser(@RequestBody RegisterUserRequest request,
+    public ResponseEntity<ApiResponse<UserDto>> createUser(@RequestBody RegisterUserRequest request,
 
     UriComponentsBuilder uriBuilder
 
     ) {
 
-      return ApiResponse.success(userService.createUser(request, uriBuilder));
+        var userDto = userService.createUser(request);
+
+        var uri = uriBuilder
+                .path("/users/{id}")
+                .buildAndExpand(userDto.getId())
+                .toUri();
+
+      return ResponseEntity
+              .created(uri)
+              .body(ApiResponse.success(userDto));
 
     }
     @PutMapping("/{id}")
-    public ApiResponse<ResponseEntity<UserDto>> updateUser(@PathVariable Long id,
+    public ApiResponse<UserDto> updateUser(@PathVariable Long id,
                               @RequestBody UpdateUserRequest request) {
         return ApiResponse.success(userService.updateUser(id, request));
     }

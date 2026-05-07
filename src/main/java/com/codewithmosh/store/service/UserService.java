@@ -1,5 +1,6 @@
 package com.codewithmosh.store.service;
 
+import com.codewithmosh.store.common.BusinessException;
 import com.codewithmosh.store.dtos.RegisterUserRequest;
 import com.codewithmosh.store.dtos.UpdateUserRequest;
 import com.codewithmosh.store.dtos.UserDto;
@@ -35,44 +36,37 @@ public class UserService {
                 .toList();
     }
 
-    public ResponseEntity<UserDto> getUserById(Long id) {
+    public UserDto getUserById(Long id) {
 
         var user = userRepository.findById(id).orElse(null);
 
         if(user == null){
-            return ResponseEntity.notFound().build();
+           throw new BusinessException(404, "User not found");
         }
 
-        return ResponseEntity.ok(userMapper.toDto(user));
+        return userMapper.toDto(user);
 
     }
-    public ResponseEntity<UserDto> createUser(RegisterUserRequest request,
-                                              UriComponentsBuilder uriBuilder
-    ) {
+    public UserDto createUser(RegisterUserRequest request) {
 
         var user = userMapper.toEntity(request);
-        System.out.println(user);
 
         userRepository.save(user);
 
-        var userDto = userMapper.toDto(user);
-        var uri = uriBuilder.path("/users/{id}").buildAndExpand(userDto.getId()).toUri();
-
-
-        return ResponseEntity.created(uri).body(userDto);
+        return userMapper.toDto(user);
     }
-    public ResponseEntity<UserDto> updateUser(Long id,
+    public UserDto updateUser(Long id,
                                               UpdateUserRequest  request){
         var user = userRepository.findById(id).orElse(null);
 
         if(user == null){
-            return ResponseEntity.notFound().build();
+            throw new BusinessException(404, "User not found");
         }
 
         userMapper.update(request, user);
         userRepository.save(user);
 
-        return ResponseEntity.ok(userMapper.toDto(user));
+        return userMapper.toDto(user);
     }
     public ResponseEntity<Void> deleteUser(Long id){
         var user = userRepository.findById(id).orElse(null);
