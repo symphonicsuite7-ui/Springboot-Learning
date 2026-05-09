@@ -6,12 +6,18 @@ import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.request.AlipayTradePagePayRequest;
 import com.codewithmosh.store.common.AliPayConfig;
 import com.alipay.api.AlipayClient;
+import com.codewithmosh.store.repositories.entities.OrderStatus;
 import com.codewithmosh.store.repositories.entities.Orders;
 import com.codewithmosh.store.service.OrderService;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/alipay")
@@ -67,5 +73,56 @@ public class AliPayController {
         httpResponse.getWriter().write(form);
         httpResponse.getWriter().flush();
         httpResponse.getWriter().close();
+    }
+    @RequestMapping("/notify")
+    public String notify(HttpServletRequest request) {
+        try {
+            // 获取支付宝POST过来反馈信息
+            Map<String, String> params = new HashMap<>();
+            Map<String, String[]> requestParams = request.getParameterMap();
+            for (Iterator<String> iter = requestParams.keySet().iterator(); iter.hasNext();) {
+                String name = iter.next();
+                String[] values = requestParams.get(name);
+                String valueStr = "";
+                for (int i = 0; i < values.length; i++) {
+                    valueStr = (i == values.length - 1) ? valueStr + values[i] : valueStr + values[i] + ",";
+                }
+                params.put(name, valueStr);
+            }
+
+            // 验证签名
+            boolean signVerified = com.alipay.api.internal.util.AlipaySignature.rsaCheckV1(
+                    params,
+                    aliPayConfig.getAlipayPublicKey(),
+                    CHARSET,
+                    SIGN_TYPE
+            );
+
+            if (signVerified) {
+                // 签名验证成功，处理业务逻辑
+                String tradeStatus = params.get("trade_status");
+                String orderNo = params.get("out_trade_no");
+
+                // 判断支付结果
+                if ("TRADE_SUCCESS".equals(tradeStatus) || "TRADE_FINISHED".equals(tradeStatus)) {
+                    // 支付成功，更新订单状态
+                    orderService.updateOrderStatus(orderNo, OrderStatus.PAID);
+                    System.out.println("订单 " + orderNo + " 支付成功，状态已更新为PAID");
+                } else if ("TRADE_CLOSED".equals(tradeStatus)) {
+                    // 交易关闭
+                    orderService.updateOrderStatus(orderNo, OrderStatus.CANCELLED);
+                    System.out.println("订单 " + orderNo + " 交易关闭，状态已更新为CANCELLED");
+                }
+
+                return "success";
+            } else {
+                // 签名验证失败
+                System.err.println("支付宝签名验证失败");
+                return "fail";
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "fail";
+        }
     }
 }

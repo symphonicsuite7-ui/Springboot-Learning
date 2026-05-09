@@ -42,4 +42,11 @@ public class OrderService {
 
         return orderRepository.findByOrderNo(orderNo);
     }
+    public void updateOrderStatus(String orderNo, OrderStatus status) {
+        Orders order = orderRepository.findByOrderNo(orderNo);
+        if (order != null) {
+            order.setStatus(status);
+            orderRepository.save(order);
+        }
+
 }
