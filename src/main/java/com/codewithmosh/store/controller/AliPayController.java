@@ -1,5 +1,6 @@
 package com.codewithmosh.store.controller;
 
+//import com.alipay.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONObject;
 import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.request.AlipayTradePagePayRequest;
@@ -33,7 +34,7 @@ public class AliPayController {
     private OrderService orderService;
 
     @RequestMapping("/pay")
-    public void pay(String orderNo, HttpServletResponse httpResponse,Long id) throws  Exception{
+    public void pay(String orderNo, HttpServletResponse httpResponse) throws  Exception{
         //查询订单信息
         Orders order = orderService.selectByOrderNo(orderNo);
         if (order == null) {

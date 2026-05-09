@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -18,12 +19,22 @@ public class Orders {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "order_no", nullable = false, unique = true, length = 64)
+    // 订单编号
     private String orderNo;
 
-    @Column(name = "total", nullable = false, precision = 10, scale = 2)
+    // 商品名称
+
+    private String goodsName;
+
+    // 总金额
     private BigDecimal total;
 
-    @Column(name = "goods_name", nullable = false)
-    private String goodsName;
+    // 状态
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status;
+
+    // 创建时间
+    private LocalDateTime createdAt;
+
+
 }
