@@ -1,9 +1,6 @@
 package com.codewithmosh.store.dtos;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.codewithmosh.store.repositories.entities.Product;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -19,5 +16,5 @@ public class CreateOrderRequest {
 
     private BigDecimal total;
 
-    private String goodsName;
+    private Product product;
 }
