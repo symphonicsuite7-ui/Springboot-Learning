@@ -4,7 +4,7 @@ package com.codewithmosh.store.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.request.AlipayTradePagePayRequest;
-import com.codewithmosh.store.common.AliPayConfig;
+import com.codewithmosh.store.config.AliPayConfig;
 import com.alipay.api.AlipayClient;
 import com.codewithmosh.store.repositories.entities.OrderStatus;
 import com.codewithmosh.store.repositories.entities.Orders;
@@ -12,6 +12,8 @@ import com.codewithmosh.store.service.OrderService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -39,7 +41,7 @@ public class AliPayController {
     @Resource
     private OrderService orderService;
 
-    @RequestMapping("/pay")
+    @GetMapping("/pay")
     public void pay(String orderNo, HttpServletResponse httpResponse) throws  Exception{
         //查询订单信息
         Orders order = orderService.selectByOrderNo(orderNo);
@@ -74,8 +76,8 @@ public class AliPayController {
         httpResponse.getWriter().flush();
         httpResponse.getWriter().close();
     }
-    @RequestMapping("/notify")
-    public String notify(HttpServletRequest request) {
+    @PostMapping("/notify")
+    public String notify(HttpServletRequest request) throws  Exception{
         try {
             // 获取支付宝POST过来反馈信息
             Map<String, String> params = new HashMap<>();

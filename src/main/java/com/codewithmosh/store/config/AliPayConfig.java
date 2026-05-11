@@ -1,4 +1,4 @@
-package com.codewithmosh.store.common;
+package com.codewithmosh.store.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
