@@ -1,4 +1,6 @@
 spring:
+  flyway:
+    validate-on-migrate: false
   application:
     name: store
   datasource:
