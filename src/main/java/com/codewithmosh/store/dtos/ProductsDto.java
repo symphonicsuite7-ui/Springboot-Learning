@@ -15,4 +15,5 @@ public class ProductsDto {
     private String description;
     private BigDecimal price;
     private Byte categoryId;
+    private Integer stock;
 }
